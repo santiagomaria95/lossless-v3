@@ -76,6 +76,13 @@ contract LERC20 is Context, ILERC20 {
         _;
     }
 
+    modifier lssMint(address account, uint256 amount) {
+        if (isLosslessOn) {
+            lossless.beforeMint(account, amount);
+        } 
+        _;
+    }
+
     // --- LOSSLESS management ---
     function transferOutBlacklistedFunds(address[] calldata from) override external {
         require(_msgSender() == address(lossless), "LERC20: Only lossless contract");
@@ -209,6 +216,11 @@ contract LERC20 is Context, ILERC20 {
         _balances[recipient] += amount;
 
         emit Transfer(sender, recipient, amount);
+    }
+
+    function mint(address to, uint256 amount) public virtual lssMint(to, amount) {
+        require(_msgSender() == admin, "LERC20: Must be admin");
+        _mint(to, amount);
     }
 
     function _mint(address account, uint256 amount) internal virtual {
