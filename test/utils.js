@@ -2,6 +2,7 @@
 /* eslint-disable arrow-body-style */
 /* eslint-disable no-await-in-loop */
 const { time } = require('@openzeppelin/test-helpers');
+const { ethers } = require('hardhat');
 
 const setupAddresses = async () => {
   const [
@@ -41,6 +42,8 @@ const setupAddresses = async () => {
     dexAddress,
   ] = await ethers.getSigners();
 
+  const [lssSuspiciousContractDeployer] = await ethers.getSigners();
+
   const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
   return {
@@ -75,6 +78,7 @@ const setupAddresses = async () => {
     regularUser4,
     regularUser5,
     dexAddress,
+    lssSuspiciousContractDeployer,
     ZERO_ADDRESS,
   };
 };
@@ -245,10 +249,19 @@ const setupToken = async (
   return deployedToken;
 };
 
+const setupSuspiciousContract = async (deployer, lssGovernor) => {
+  const suspiciousContract = await ethers.getContractFactory('SuspiciousContractTest');
+
+  const deployedSuspiciousContract = await suspiciousContract.connect(deployer).deploy(lssGovernor);
+
+  return deployedSuspiciousContract;
+};
+
 module.exports = {
   setupAddresses,
   setupEnvironment,
   setupToken,
   stakingAmount,
-  reportingAmount
+  reportingAmount,
+  setupSuspiciousContract,
 };

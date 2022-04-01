@@ -571,6 +571,12 @@ contract LosslessGovernance is ILssGovernance, Initializable, AccessControlUpgra
 
     }
 
+    /// @notice This lets an erroneously reported smart contract to retrieve compensation
+    function retrieveSmartContractCompensation() override public whenNotPaused {
+        require(isContract(msg.sender), "LSS: Sender is not a smart contract");
+        retrieveCompensation();
+    }
+
     ///@notice This function verifies is an address belongs to a contract
     ///@param _addr address to verify
     function isContract(address _addr) private view returns (bool){
